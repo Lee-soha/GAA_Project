@@ -10,6 +10,7 @@ import openai
 import pickle
 from joblib import load
 
+toon = pd.concat([pd.read_csv('naver.csv'), pd.read_csv('naver_challenge.csv')], ignore_index=True)
 def get_webtoon_info(new_title, new_description):
     # 함수 전처리
     okt = Okt()
@@ -51,7 +52,8 @@ def get_webtoon_info(new_title, new_description):
         sim_scores = sorted(list(enumerate(cosine_similarity(overview_tfidf, tfidf_desc_vect.transform(clean_desc_list)).flatten())), key=lambda x: x[1], reverse=True)
         sim_scores = sim_scores[1:11]
         toon_indices = [i[0] for i in sim_scores]
-        return [clean_title_list[i] for i in toon_indices]
+        recommended_webtoons = toon.loc[toon_indices, 'title'].tolist()
+        return recommended_webtoons
 
     # 추천 줄거리 제공
     openai.api_key = "OPENAI_API_KEY"
